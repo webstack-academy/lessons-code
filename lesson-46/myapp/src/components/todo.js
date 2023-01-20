@@ -6,7 +6,10 @@ class TodoComponent extends Component {
         this.state = {
             loading: true,
             testoNuovaAttivita: '',
-            attivita: []
+            attivita: [],
+            change: false,
+            valueToChange: null,
+            indexToChange: null
         }
     }
 
@@ -48,6 +51,28 @@ class TodoComponent extends Component {
         });
     }
 
+    mostraModificaInpute = (ele, index) => {
+        this.setState({
+            valueToChange: ele,
+            indexToChange: index,
+            change: true
+        })
+    }
+
+    applicaModifiche = () => {
+        this.setState({
+            attivita: this.state.attivita.map((value, index) => {
+                if (this.state.indexToChange === index) {
+                    return this.state.valueToChange
+                }
+
+                return value
+            }),
+            change: false
+        })
+    }
+
+
     render() {
         return (
             <div>
@@ -58,11 +83,37 @@ class TodoComponent extends Component {
                     <div>
                         <ul>
                             {this.state.attivita.map((ele, index) => (
-                                <li>{ele} <span onClick={evt => this.eliminaAttivita(index)}>x</span></li>
+                                <li>
+                                    {ele} 
+                                    <span onClick={evt => this.eliminaAttivita(index)}>x</span> {'  '}
+                                    <button onClick={() => this.mostraModificaInpute(ele, index)} type="button">modifica</button>
+                                </li>
                             ))}
                         </ul>
-                        <input type="text" onInput={evt => this.setState({ testoNuovaAttivita: evt.target.value })} placeholder="Inserisci qualcosa da fare..." />
+
+                        
+                        { this.state.change ? 
+                    <div>
+                        <input type="text" 
+                        onInput={evt => this.setState({ valueToChange: evt.target.value })} 
+                        value={this.state.valueToChange} 
+                        placeholder="Inserisci qualcosa da modificare..." 
+                        />
+                        
+                        <button onClick={this.applicaModifiche} type="button">Applica modifica</button>
+                        <button onClick={() => this.setState({ 
+                            change: false
+                            })} type="button">Annulla</button>
+                    </div>    
+                    :
+                    <div>
+                        <input type="text" 
+                        onInput={event => this.setState({ testoNuovaAttivita: event.target.value })} 
+                        placeholder="Inserisci qualcosa da fare..." 
+                        value=""/>
                         <button onClick={this.aggiungiAttivita} type="button">Aggiungi</button>
+                    </div>
+                    }
                     </div>
                 }
             </div>
